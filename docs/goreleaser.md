@@ -4,13 +4,16 @@
 
 ### Tag
 
-GoReleaser will use the latest Git tag of your repository.
+GoReleaser release only against the last tag and the repo HEAD should be at this commit
 ```bash
 git tag -a v0.1.0 -m "First release"
-git push origin v0.1.0
 ```
 
 Custom: https://goreleaser.com/cookbooks/set-a-custom-git-tag/
+```bash
+export GORELEASER_PREVIOUS_TAG=v0.1.0-jreleaser
+export GORELEASER_CURRENT_TAG=v0.1.1-goreleaser
+```
  
 ### Snapshot
 
@@ -39,9 +42,10 @@ Release is done against a tag and the current commit should be this tag
 ```bash
 # commit and tag
 git tag -a v0.1.1-goreleaser -m "build: go releaser clean"
-#git push origin v0.1.0
-goreleaser release
+# --skip=validate to avoid in a dirty state
+goreleaser release --clean --skip=validate
 ```
+or checkout the tag
 
 ### Build Single target
 
