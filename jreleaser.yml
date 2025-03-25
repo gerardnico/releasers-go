@@ -1,9 +1,27 @@
+project:
+  # The name of the project
+  # * the default name of the Github repository
+  name: releasers-go
+  description: 1001 ways to release a Go HelloWorld
+  longDescription: 1001 ways to release a Go HelloWorld
+  links:
+    homepage: https://github.com/gerardnico/releasers-go
+  authors:
+    - Foo Bar
+  license: MIT
+  inceptionYear: '2025'
+  stereotype: CLI
+
+
 environment:
   properties:
     # The base output of the gobuild dir
     go_build_dir: 'out/go'
+    # The executable name (It's set on multiple place)
     executable_name: 'helloworld'
 
+# A matrix lets you define variables that can be used to parameterize Hooks, and Archive.
+# https://jreleaser.org/guide/latest/reference/matrix.html
 matrix:
   rows:
     - { goos: darwin,  goarch: arm64, platform: osx-aarch_64     }
@@ -36,18 +54,6 @@ hooks:
         filter:
           includes: ['assemble']
 
-project:
-  name: helloworld
-  description: HelloWorld in Go
-  longDescription: HelloWorld in Go
-  links:
-    homepage: https://github.com/gerardnico/releasers-go
-  authors:
-    - Foo Bar
-  license: MIT
-  inceptionYear: '2024'
-  stereotype: CLI
-
 
 release:
   github:
@@ -61,6 +67,8 @@ release:
 assemble:
   archive:
     # This is the distribution name
+    # The archive created will be added as artifacts to the distribution
+    # You can see them with `jreleaser config`
     releasers-go:
       active: ALWAYS
       formats: [ ZIP ]
@@ -75,7 +83,9 @@ assemble:
 
 
 distributions:
-  # This is the distribution name (The name of the executable by default ie distributionExecutableUnix)
+  # This is the distribution name
+  # * The name of the executable by default ie distributionExecutableUnix
+  # * The docker image name (ie {{repoOwner}}/{{distributionName}}:{{tagName}})
   releasers-go:
     executable:
       # This is the name of the executable (distributionExecutableUnix)
@@ -83,7 +93,16 @@ distributions:
       windowsExtension: exe
     docker:
       active: ALWAYS
+      # The default value for info
+      baseImage: scratch
+      # The default template does not work with the default scratch image
       templateDirectory: .jreleaser/docker
+      # repository here is where the generated artifacts are store (ie docker file, binary, license)
+      repository:
+        active: NEVER # on by default
+      labels:
+        # To connect to Github
+        org.opencontainers.image.source: '{{projectWebsite}}'
       registries:
         - serverName: ghcr.io
 # Not needed, jreleaser creates only one image choosing amd64, linux. How? First by name

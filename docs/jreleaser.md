@@ -2,15 +2,65 @@
 
 [JReleaser](https://jreleaser.org/)
 
+## Concept
+
+### Version
+
+The version (ie the id) of the release is mandatory
+
+* Manual
+```bash
+export JRELEASER_PROJECT_VERSION=0.1.0
+```
+* Automatic with git-cliff of any other changelog conventional commit parser
+```bash
+export JRELEASER_PROJECT_VERSION=$(git cliff --bumped-version)
+```
+
+### Distribution
+
+The distribution has:
+* a type (BINARY, ...)
+* a list of all artifacts
+* a list of packagers configuration
+* and a platform
+
+
+```bash
+jreleaser config
+```
+
+### Platform
+
+Platform is a mix of os and arch.
+
+It's added as property of
+* the artifacts (distribution.artifacts)
+* the distribution
+
+
+### Template
+
+https://jreleaser.org/guide/latest/reference/name-templates.html#_project
+```gotemplate
+{{projectName}}
+```
+
 ## Command
+
+### Config 
+
+Check the actual values with
+```bash
+jreleaser config --full
+```
 
 ### Jreleaser Assemble (ie Build/Compile)
 
 * Build in [the binaries](../out/go) 
 * Create the [archives](../out/jreleaser/assemble/helloworld/archive)
 
-```bash
-export JRELEASER_PROJECT_VERSION=0.1.0 # The version to release (mandatory)
+```bash 
 jreleaser assemble
 ```
 
@@ -31,6 +81,15 @@ Change log creation
 ```bash
 jreleaser changelog
 ```
+Generated at `out/jreleaser/release/CHANGELOG.md`
+
+Can be [externally generated](https://jreleaser.org/guide/latest/reference/release/changelog.html#_external_changelog)
+```yaml
+release:
+  github:
+    changelog:
+      external: partial-changelog.md
+```
 
 ### JReleaser Release
 
@@ -42,14 +101,32 @@ export JRELEASER_GITHUB_TOKEN=xxxx
 jreleaser release
 ```
 
-### JReleaser Package
+### JReleaser Docker Packager
 
-Package creation (Docker for now)
+You can set docker configuration in 2 place:
+* under packagers for one (the first platform by name??)
+* and [distribution for multiple images](https://jreleaser.org/guide/latest/reference/packagers/docker.html#_multiple_dockerfile_per_distribution)
 
+
+Steps:
+
+* delete them otherwise Jreleaser will upload/publish all image with the same repo
 ```bash
-# delete them otherwise Jreleaser will upload/publish all image with the same repo
 docker rmi -f $(docker images -q ghcr.io/gerardnico/releasers-go)
+```
+```bash
 jreleaser package
+```
+
+The following labels are added, not `LABEL org.opencontainers.image.source https://github.com/OWNER/REPO` unfortunately
+```yaml
+ labels:
+   org.opencontainers.image.title: {{distributionName}}
+   org.opencontainers.image.description: {{projectDescription}}
+   org.opencontainers.image.url: {{projectWebsite}}
+   org.opencontainers.image.licenses: {{projectLicense}}
+   org.opencontainers.image.version: {{projectVersion}}
+   org.opencontainers.image.revision: {{commitFullHash}}
 ```
 
 ### JReleaser Publish (Push Package to registry)
@@ -65,9 +142,4 @@ jreleaser publish
 * [release](./.github/workflows/release.yml)
 * [early-access.yml](./.github/workflows/early-access.yml) - rolling early-access releases on every push to `main` branch
 
-### Template
-
-https://jreleaser.org/guide/latest/reference/name-templates.html#_project
-```gotemplate
-{{projectName}}
-``` 
+ 
