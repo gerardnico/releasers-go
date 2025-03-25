@@ -1,0 +1,96 @@
+environment:
+  properties:
+    # The base output of the gobuild dir
+    go_build_dir: 'out/go'
+    executable_name: 'helloworld'
+
+matrix:
+  rows:
+    - { goos: darwin,  goarch: arm64, platform: osx-aarch_64     }
+    - { goos: darwin,  goarch: amd64, platform: osx-x86_64       }
+    - { goos: linux,   goarch: arm64, platform: linux-aarch_64   }
+    - { goos: linux,   goarch: amd64, platform: linux-x86_64     }
+    - { goos: windows, goarch: arm64, platform: windows-aarch_64 }
+    - { goos: windows, goarch: amd64, platform: windows-x86_64   }
+
+hooks:
+  script:
+    before:
+      - run: |
+          OUTPUT="${GO_BUILD_DIR}/${GOOS}-${GOARCH}/${EXECUTABLE_NAME}"
+          if [ "${GOOS}" == "windows" ]; then
+            OUTPUT="${OUTPUT}.exe"
+          fi
+          echo "building ${OUTPUT}"
+          # CGO_ENABLED=0 disable dynamic library. Ie the executable is not linked otherwise 
+          # you get `no such file or directory error` in a docker container while it search for a library
+          # https://stackoverflow.com/questions/55106186/no-such-file-or-directory-with-docker-scratch-image
+          CGO_ENABLED=0 go build -o "$OUTPUT"  src/helloworld.go
+        applyDefaultMatrix: true
+        verbose: true
+        environment:
+          GOOS: '{{ matrix.goos }}'
+          GOARCH: '{{ matrix.goarch }}'
+          GO_BUILD_DIR: '{{ go_build_dir }}'
+          EXECUTABLE_NAME: '{{ executable_name }}'
+        filter:
+          includes: ['assemble']
+
+project:
+  name: helloworld
+  description: HelloWorld in Go
+  longDescription: HelloWorld in Go
+  links:
+    homepage: https://github.com/gerardnico/releasers-go
+  authors:
+    - Foo Bar
+  license: MIT
+  inceptionYear: '2024'
+  stereotype: CLI
+
+
+release:
+  github:
+    overwrite: true
+    changelog:
+      formatted: ALWAYS
+      preset: conventional-commits
+      contributors:
+        format: '- {{contributorName}}{{#contributorUsernameAsLink}} ({{.}}){{/contributorUsernameAsLink}}'
+
+assemble:
+  archive:
+    # This is the distribution name
+    releasers-go:
+      active: ALWAYS
+      formats: [ ZIP ]
+      applyDefaultMatrix: true
+      archiveName: '{{executable_name}}-{{projectVersion}}-{{ matrix.goos }}-{{ matrix.goarch }}'
+      fileSets:
+        - input: 'out/go/{{ matrix.goos }}-{{ matrix.goarch }}'
+          output: 'bin'
+          includes: [ '{{executable_name}}{.exe,}' ]
+        - input: '.'
+          includes: [ 'LICENSE' ]
+
+
+distributions:
+  # This is the distribution name (The name of the executable by default ie distributionExecutableUnix)
+  releasers-go:
+    executable:
+      # This is the name of the executable (distributionExecutableUnix)
+      name: '{{executable_name}}'
+      windowsExtension: exe
+    docker:
+      active: ALWAYS
+      templateDirectory: .jreleaser/docker
+      registries:
+        - serverName: ghcr.io
+# Not needed, jreleaser creates only one image choosing amd64, linux. How? First by name
+#      specs:
+#        linux-amd:
+#          imageNames:
+#            - 'gerardnico/helloworld-go:{{tagName}}'
+#          # match by platform
+#          matchers:
+#            platform: 'linux-x86_64'
