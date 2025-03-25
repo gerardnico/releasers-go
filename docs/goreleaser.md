@@ -19,6 +19,7 @@ goreleaser release --snapshot
 
 ## Command
 ### Local release
+
 ```bash
 goreleaser release --snapshot --clean
 ```
