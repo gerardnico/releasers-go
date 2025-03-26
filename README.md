@@ -33,7 +33,7 @@ task jr-release
 
 ### GoReleaser
 
-[GoReleaser](docs/goreleaser.md) release from the last tag.
+[GoReleaser](docs/goreleaser.md) releases from the last tag.
 
 It expects:
 * you to create the tag with a semantic version
