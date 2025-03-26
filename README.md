@@ -27,6 +27,8 @@ From a version, it will:
 ```bash
 export JRELEASER_PROJECT_VERSION=0.1.0-jreleaser
 jrelease publish
+# or for a more advanced script
+task jr-release
 ```
 
 ### GoReleaser
@@ -39,7 +41,7 @@ It expects:
 
 ```bash
 git tag -a v0.1.1-goreleaser -m "build: go releaser clean"
-# --skip=validate to avoid in a dirty state
+# --skip=validate to avoid the error: git is in a dirty state
 goreleaser release --clean --skip=validate
 ```
 
@@ -48,7 +50,7 @@ goreleaser release --clean --skip=validate
 [Ko](docs/ko.md) - go docker release only
 
 ```bash
-task 
+task ko-build 
 ```
 
 ## Packaging
@@ -88,11 +90,11 @@ export NEW_VERSION=$(git cliff --bumped-version);
 
 ### JReleaser Changelog
 
-See [](docs/jreleaser.md#jreleaser-changelog)
+See [jreleaser-changelog](docs/jreleaser.md#jreleaser-changelog)
 
 ### GoReleaser Changelog
 
-See [](docs/goreleaser.md#changelog)
+See [goreleaser changelog](docs/goreleaser.md#changelog)
 
 ### Github Changelog
 
