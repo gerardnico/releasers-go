@@ -35,6 +35,10 @@ You can verify your .goreleaser.yaml is valid by running the check command:
 goreleaser check
 ```
 
+### ChangeLog
+
+https://goreleaser.com/customization/changelog/
+
 ### Release
 
 Release is done against a tag and the current commit should be this tag

@@ -2,6 +2,10 @@
 
 [JReleaser](https://jreleaser.org/)
 
+
+
+
+
 ## Concept
 
 ### Version
@@ -48,9 +52,16 @@ https://jreleaser.org/guide/latest/reference/name-templates.html#_project
 
 ## Command
 
-### Config 
+* `config`: [Check and create the config](#jreleaser-config)
+* `changelog`: [create a changelog](#jreleaser-changelog)
+* `assemble`: [create build artifact (ie build + archive)](#jreleaser-assemble-ie-buildcompile)
+* `release`: create a release in a git hosting service (ie changelog + build artifact) and create a tag [release](#jreleaser-release)
+* `package`: create a package (ie docker, homebrew)
+* `publish`: publish the packages to a registry
 
-Check the actual values with
+### JReleaser Config
+
+Check the actual values and the generated one with:
 ```bash
 jreleaser config --full
 ```
@@ -136,7 +147,7 @@ Push Package to the registry
 jreleaser publish
 ```
 
-### JReleaser GitHub Workflow
+## GitHub Workflow
 
 [GitHub Actions](https://github.com/features/actions) workflow:
 * [release](./.github/workflows/release.yml)
