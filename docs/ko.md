@@ -6,7 +6,7 @@ Builds and pushes a container image, and prints the resulting image digest to st
 
 ```bash
 KO_DOCKER_REPO=ghcr.io/gerardnico/mail-checker
-ko build . \
+GOFLAGS="-ldflags=-X=main.version=$JRELEASER_PROJECT_VERSION" ko build . \
   --image-label org.opencontainers.image.source=https://github.com/gerardnico/mail-checker \
   --image-label org.opencontainers.image.description=MailChecker \
   --image-label org.opencontainers.image.title=MailChecker \

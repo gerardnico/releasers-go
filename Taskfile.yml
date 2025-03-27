@@ -42,8 +42,7 @@ tasks:
   ko-build:
     cmds:
       - |
-          
-          ko build . \
+        GOFLAGS="-ldflags=-X=main.version=$JRELEASER_PROJECT_VERSION" ko build . \
               --image-label org.opencontainers.image.source=https://github.com/$GIT_REP0 \
               --image-label org.opencontainers.image.description=HelloWorld \
               --image-label org.opencontainers.image.title=HelloWorld \
@@ -56,13 +55,9 @@ tasks:
         
 
   # Create the binary and add it to the bin in GOPATH/bin
-  go-install:
+  install:
     cmds:
-      - go install
-
-  go-build:
-    cmds:
-      - CGO_ENABLED=0 GOOS=linux GOARCH="arm64" go build -o dist/linux_arm64/mail-checker
+      - CGO_ENABLED=0 GOOS=linux GOARCH="arm64" go install -ldflags="-X 'main.version=$(git cliff --bumped-version)'" src/helloworld.go
 
 
 

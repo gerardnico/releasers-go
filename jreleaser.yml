@@ -43,7 +43,7 @@ hooks:
           # CGO_ENABLED=0 disable dynamic library. Ie the executable is not linked otherwise 
           # you get `no such file or directory error` in a docker container while it search for a library
           # https://stackoverflow.com/questions/55106186/no-such-file-or-directory-with-docker-scratch-image
-          CGO_ENABLED=0 go build -o "$OUTPUT"  src/helloworld.go
+          CGO_ENABLED=0 go build -ldflags="-X 'main.version=v$VERSION'" -o "$OUTPUT"  src/helloworld.go
         applyDefaultMatrix: true
         verbose: true
         environment:
@@ -51,6 +51,8 @@ hooks:
           GOARCH: '{{ matrix.goarch }}'
           GO_BUILD_DIR: '{{ go_build_dir }}'
           EXECUTABLE_NAME: '{{ executable_name }}'
+          # https://jreleaser.org/guide/latest/reference/name-templates.html#_project
+          VERSION: '{{ projectVersion }}'
         filter:
           includes: ['assemble']
 
